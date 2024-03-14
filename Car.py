@@ -3,6 +3,7 @@ import sys
 from config import *
 from CarMessage import *
 
+
 def main():
     if len(sys.argv) < 2:
         port = 0
@@ -21,7 +22,7 @@ def main():
             try:
                 client_socket, address = s.accept()
                 print(f"Accepted connection from {address}")
-                
+
                 raw_msg = client_socket.recv(1024)
 
                 msg = CarMessage(raw_msg=raw_msg)
@@ -31,7 +32,8 @@ def main():
                         print("Starting rental...")
 
                         if is_rented:
-                            client_socket.send(CarMessage(CarMessage.ERR_FAIL, reason_code=CarMessage.REASON_ALREADY_RENTED).to_binary())
+                            client_socket.send(CarMessage(CarMessage.ERR_FAIL,
+                                                          reason_code=CarMessage.REASON_ALREADY_RENTED).to_binary())
                         else:
                             is_rented = True
                             client_socket.send(CarMessage(CarMessage.ERR_SUCCESS).to_binary())
@@ -39,7 +41,8 @@ def main():
                         print("Ending rental...")
 
                         if not is_rented:
-                            client_socket.send(CarMessage(CarMessage.ERR_FAIL, reason_code=CarMessage.REASON_NOT_RENTED).to_binary())
+                            client_socket.send(
+                                CarMessage(CarMessage.ERR_FAIL, reason_code=CarMessage.REASON_NOT_RENTED).to_binary())
                         else:
                             is_rented = False
                             client_socket.send(CarMessage(CarMessage.ERR_SUCCESS).to_binary())
@@ -56,6 +59,7 @@ def main():
     except KeyboardInterrupt:
         print("Closing server...")
         s.close()
+
 
 if __name__ == '__main__':
     main()

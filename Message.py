@@ -1,12 +1,15 @@
 import struct
 
+
 class InvalidMessageError(Exception):
-	def __init__(self, message):
-		super().__init__(message)
-          
+    def __init__(self, message):
+        super().__init__(message)
+
+
 class InvalidMessageTypeError(Exception):
     def __init__(self, message):
         super().__init__(message)
+
 
 class Message:
     MSG_REGISTER = 0
@@ -58,6 +61,6 @@ class Message:
 
     def to_binary(self):
         return struct.pack('>HbH', self.user_id, self.msg_type, self.msg_size) + self.msg.encode('utf-8')
-    
+
     def __str__(self) -> str:
         return f"User ID: {self.user_id}\nMessage Type: {self.type_to_str[self.msg_type]}\nMessage Size: {self.msg_size}\nMessage: {self.msg}"

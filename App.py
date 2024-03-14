@@ -3,6 +3,7 @@ from config import *
 from Message import Message
 import sys
 
+
 def main():
     s = socket.socket()
 
@@ -47,6 +48,7 @@ def main():
 
         recv_msg = s.recv(1024)
         print(Message(bin_msg=recv_msg))
+
 
 if __name__ == '__main__':
     main()
