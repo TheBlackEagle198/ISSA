@@ -12,7 +12,7 @@ def main():
     pygame.display.set_caption("Mouse Position Tracker")
 
     # Load the background image
-    background = pygame.image.load("main.png").convert()
+    background = pygame.image.load("img/main.png").convert()
 
     # Set up the socket connection
     s = socket.socket()
