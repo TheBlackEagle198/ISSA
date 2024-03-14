@@ -46,8 +46,7 @@ def main():
 
         if params:
             if params[0].lower() == "exit":
-                s.close()
-                running = False
+                break
             elif params[0].lower() == "register":
                 message.msg_type = Message.MSG_REGISTER
                 message.msg = params[1] if len(params) > 1 else ""
@@ -70,6 +69,7 @@ def main():
 
         clock.tick(30)
 
+    s.close()
     pygame.quit()
 
 if __name__ == '__main__':
