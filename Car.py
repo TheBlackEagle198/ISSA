@@ -4,6 +4,7 @@ from config import *
 from CarMessage import *
 import threading
 import pygame
+import pyperclip
 
 
 class CarServer(threading.Thread):
@@ -58,7 +59,6 @@ class CarServer(threading.Thread):
 
                     client_socket.close()
                 except TimeoutError:
-                    print("Timeout...")
                     if self.exit_request:
                         print("Exiting server...")
                         break
@@ -69,23 +69,37 @@ class CarServer(threading.Thread):
 
 
     def get_car_info(self):
-        return self.s.getsockname()
+        return f"{self.s.getsockname()[0]}:{self.s.getsockname()[1]}"
 
 class MainView:
     def __init__(self, screen, font) -> None:
         self.screen = screen
         self.font = font
+        self.info_btn = None
 
-
-    def draw(self, is_rented: bool):
+    def draw(self, is_rented: bool, car_info: str):
         self.screen.fill(pygame.Color("green") if is_rented else pygame.Color("red"))
-        text = "You can drive the car" if is_rented else "Car is available for rental"
-        text_surface = self.font.render(text, True, (255, 255, 255))
+        
+        info_text = f"Car: {car_info}"
+        info = self.font.render(info_text, True, (255, 255, 255))
 
-        center_x = self.screen.get_width() / 2 - text_surface.get_width() / 2
-        center_y = self.screen.get_height() / 2 - text_surface.get_height() / 2
+        avl_text = "You can drive the car" if is_rented else "Car is available for rental"
+        avl = self.font.render(avl_text, True, (255, 255, 255))
 
-        self.screen.blit(text_surface, (center_x, center_y))
+        # Compute the center of the screen for the first line of text.
+        center_info_x = (self.screen.get_width() - info.get_width()) // 2
+        center_info_y = (self.screen.get_height() - info.get_height()) // 2
+
+        # Compute the position for the second line of text.
+        center_avl_x = (self.screen.get_width() - avl.get_width()) // 2
+        center_avl_y = center_info_y + avl.get_height()
+
+        # Blit the text surfaces onto the screen.
+        self.screen.blit(avl, (center_avl_x, center_avl_y))
+        self.screen.blit(info, (center_info_x, center_info_y))
+
+        self.info_btn = pygame.Rect(center_info_x, center_info_y, info.get_width(), info.get_height())
+
         pygame.display.flip()
 
 def main():
@@ -110,12 +124,18 @@ def main():
                 should_stop_gui = True
                 continue
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    should_stop_gui = True
-                    break
+                match event.type:
+                    case pygame.QUIT:
+                        should_stop_gui = True
+                        break
+                    case pygame.MOUSEBUTTONDOWN:
+                        if main_view.info_btn:
+                            if main_view.info_btn.collidepoint(event.pos):
+                                print("Info button clicked!")
+                                pyperclip.copy(car_server.get_car_info())
             if last_car_state != car_server.is_rented:
                 last_car_state = car_server.is_rented
-                main_view.draw(last_car_state)
+                main_view.draw(last_car_state, car_server.get_car_info().__str__())
             clock.tick(30)
     except KeyboardInterrupt:
         pass
