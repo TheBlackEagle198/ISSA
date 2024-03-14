@@ -1,0 +1,8 @@
+The app will start bz showing the main screen.
+When the user clicks anywhere on the screen the menu page will show up. This page has two buttons, one for car registration and one for requesting a ride.
+If the user clicks on the car registration button, the app will switch the screen the register page. Here the user will be able to register a car by entering the IP address and the port of the car.
+After registering the car, the app will switch back to the thanks screen.
+If the user clicks on the request ride button, the app will switch to the carlist page. Here the user will be able to request a ride by clicking on the cars available.
+After choosing a car the app will switch to the ride page. This page will stay on till the ride is complete. To end the ride the user needs to click on the "End Ride" button.
+After ending the ride, the app will switch to the thanks page.
+No matter what choice the user made, after getting to the thanks page and clicking anywhere on the screen, the app will switch back to the main screen.

@@ -1,54 +1,76 @@
+import pygame
 import socket
+import sys
 from config import *
 from Message import Message
-import sys
-
 
 def main():
+    pygame.init()
+
+    # Set up the display
+    screen = pygame.display.set_mode((800, 600))
+    pygame.display.set_caption("Mouse Position Tracker")
+
+    # Load the background image
+    background = pygame.image.load("main.png").convert()
+
+    # Set up the socket connection
     s = socket.socket()
-
     port = backend_port
-
     s.connect(('localhost', port))
-
     user_id = int(sys.argv[1])
 
-    while True:
-        # message you send to the server
-        console_input = input("-> ")
+    clock = pygame.time.Clock()
 
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                # Get the mouse position
+                mouse_pos = pygame.mouse.get_pos()
+                print("Mouse Position:", mouse_pos)
+
+        # Draw the background
+        screen.blit(background, (0, 0))
+
+        # Update the display
+        pygame.display.flip()
+
+        # Send message to the server
+        console_input = input("-> ")
         params = console_input.split()
 
-        message = Message(
-            user_id=user_id
-        )
+        message = Message(user_id=user_id)
 
-        match params[0].lower():
-            case "exit":
+        if params:
+            if params[0].lower() == "exit":
                 s.close()
-                break
-            case "register":
+                running = False
+            elif params[0].lower() == "register":
                 message.msg_type = Message.MSG_REGISTER
-                message.msg = params[1]
-            case "request_cars":
+                message.msg = params[1] if len(params) > 1 else ""
+            elif params[0].lower() == "request_cars":
                 message.msg_type = Message.MSG_REQUEST_CARS
-            case "start_rental":
+            elif params[0].lower() == "start_rental":
                 message.msg_type = Message.MSG_START_RENTAL
-                message.msg = params[1]
-            case "end_rental":
+                message.msg = params[1] if len(params) > 1 else ""
+            elif params[0].lower() == "end_rental":
                 message.msg_type = Message.MSG_END_RENTAL
-                message.msg = params[1]
-            case "bad_message_type":
+                message.msg = params[1] if len(params) > 1 else ""
+            elif params[0].lower() == "bad_message_type":
                 message.msg_type = 100
-            case _:
+            else:
                 print("Invalid command!")
-                continue
 
-        s.send(message.to_binary())
+            s.send(message.to_binary())
+            recv_msg = s.recv(1024)
+            print(Message(bin_msg=recv_msg))
 
-        recv_msg = s.recv(1024)
-        print(Message(bin_msg=recv_msg))
+        clock.tick(30)  # Limit frame rate to 30 FPS
 
+    pygame.quit()
 
 if __name__ == '__main__':
     main()
