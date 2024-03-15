@@ -86,9 +86,28 @@ def main():
 
                     print(car_list)
 
+                    # Create buttons for each car
+                    car_buttons = []
+                    for i, car in enumerate(car_list):
+                        print("banana")
+                        button_rect = pygame.Rect(1175, 700 + i * 100, 600, 50)  # Adjust these values as needed
+                        car_buttons.append(button_rect)
+                        pygame.draw.rect(screen, (255, 255, 255), button_rect)
+                        draw_text(screen, car, (1175, 700 + i * 100), font, (0, 0, 0))  # Adjust these values as needed
 
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        for i, button_rect in enumerate(car_buttons):
+                            if button_rect.collidepoint(mouse_pos):
+                                # Send message to request ride
+                                chosen_car = car_list[i]
+                                message = Message(user_id=user_id, msg_type=Message.MSG_START_RENTAL, msg=chosen_car)
+                                s.send(message.to_binary())
+                                recv_msg = s.recv(1024)
+                                print(Message(bin_msg=recv_msg))
+                                current_screen = "ride"
+                                break
                 elif current_screen == "ride":
-                    if 200 <= mouse_pos[0] <= 600 and 275 <= mouse_pos[1] <= 400:
+                    if 200 <= mouse_pos[0] <= 250 and 500 <= mouse_pos[1] <= 400:
                         # End ride button clicked
                         message = Message(user_id=user_id, msg_type=Message.MSG_END_RENTAL, msg=chosen_car)
                         s.send(message.to_binary())
