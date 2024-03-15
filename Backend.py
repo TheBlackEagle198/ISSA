@@ -105,7 +105,7 @@ class ClientHandler(threading.Thread):
                 except CarUnavailable as e:
                     print("Car unavailable: " + str(e))
                     self.client_socket.send(Message(msg_type=Message.ERR_CAR_UNAVAILABLE).to_binary())
-        except (BrokenPipeError, ConnectionResetError) as e:
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError) as e:
             print(f"Client {str(self.client_socket)} disconnected!, " + str(e))
         finally:
             self.client_socket.close()
@@ -133,7 +133,7 @@ class ClientHandler(threading.Thread):
         print("Requesting cars...")
         cars = self.car_db.get_all()
 
-        payload = ''.join([f"{car[1].addr}:{car[1].port}\n" for car in cars])
+        payload = ''.join([f"{car.addr}:{car.port}\n" for car in cars])
 
         msg = Message(msg_type=Message.MSG_CAR_LIST, msg=payload)
         self.client_socket.send(msg.to_binary())
@@ -229,8 +229,8 @@ class CarDB:
         except KeyError:
             return None
 
-    def get_all(self):
-        return self.cars.items()
+    def get_all(self) -> list[CarEntity]:
+        return list(filter(lambda car: car.rented == False, self.cars.values()))
 
 
 def main():
