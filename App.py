@@ -8,8 +8,8 @@ def main():
     pygame.init()
 
     # Set up the display
-    screen = pygame.display.set_mode((800, 600))
-    pygame.display.set_caption("Mouse Position Tracker")
+    screen = pygame.display.set_mode((1920, 1080))
+    pygame.display.set_caption("Car Sharing App")
 
     # Load the background image
     background = pygame.image.load("img/main.png").convert()
@@ -68,7 +68,7 @@ def main():
             recv_msg = s.recv(1024)
             print(Message(bin_msg=recv_msg))
 
-        clock.tick(30)  # Limit frame rate to 30 FPS
+        clock.tick(30)
 
     pygame.quit()
 
