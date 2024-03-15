@@ -57,12 +57,12 @@ def main():
                 if current_screen == "main":
                     current_screen = "menu"
                 elif current_screen == "menu":
-                    if 1200 <= mouse_pos[0] <= 1700 and 700 <= mouse_pos[1] <= 900:
-                        current_screen = "register"
-                    elif 1200 <= mouse_pos[0] <= 1700 and 400 <= mouse_pos[1] <= 600:
+                    if 1120 <= mouse_pos[0] <= 480 and 1550 <= mouse_pos[1] <= 570:
                         current_screen = "carlist"
+                    elif 1200 <= mouse_pos[0] <= 650 and 1550 <= mouse_pos[1] <= 740:
+                        current_screen = "register"
                 elif current_screen == "register":
-                    if 1575 <= mouse_pos[0] <= 1775 and 700 <= mouse_pos[1] <= 1000:
+                    if 1575 <= mouse_pos[0] <= 700 and 1760 <= mouse_pos[1] <= 850:
                         car_id = registering_text
                         if not is_valid_car_id(car_id):
                             print("Invalid car ID")
@@ -86,26 +86,7 @@ def main():
 
                     print(car_list)
 
-                    # Create buttons for each car
-                    car_buttons = []
-                    for i, car in enumerate(car_list):
-                        print("banana")
-                        button_rect = pygame.Rect(1175, 700 + i * 100, 600, 50)  # Adjust these values as needed
-                        car_buttons.append(button_rect)
-                        pygame.draw.rect(screen, (255, 255, 255), button_rect)
-                        draw_text(screen, car, (1175, 700 + i * 100), font, (0, 0, 0))  # Adjust these values as needed
 
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        for i, button_rect in enumerate(car_buttons):
-                            if button_rect.collidepoint(mouse_pos):
-                                # Send message to request ride
-                                chosen_car = car_list[i]
-                                message = Message(user_id=user_id, msg_type=Message.MSG_START_RENTAL, msg=chosen_car)
-                                s.send(message.to_binary())
-                                recv_msg = s.recv(1024)
-                                print(Message(bin_msg=recv_msg))
-                                current_screen = "ride"
-                                break
                 elif current_screen == "ride":
                     if 200 <= mouse_pos[0] <= 600 and 275 <= mouse_pos[1] <= 400:
                         # End ride button clicked
