@@ -1,76 +1,62 @@
-import pygame
 import socket
-import sys
 from config import *
 from Message import Message
+import sys
+
 
 def main():
-    pygame.init()
-
-    # Set up the display
-    screen = pygame.display.set_mode((1920, 1080))
-    pygame.display.set_caption("Car Sharing App")
-
-    # Load the background image
-    background = pygame.image.load("img/main.png").convert()
-
-    # Set up the socket connection
     s = socket.socket()
+
     port = backend_port
+
     s.connect(('localhost', port))
+    s.settimeout(5)
     user_id = int(sys.argv[1])
 
-    clock = pygame.time.Clock()
+    try:
+        while True:
+            # message you send to the server
+            console_input = input("-> ")
 
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                # Get the mouse position
-                mouse_pos = pygame.mouse.get_pos()
-                print("Mouse Position:", mouse_pos)
+            params = console_input.split()
 
-        # Draw the background
-        screen.blit(background, (0, 0))
+            message = Message(
+                user_id=user_id
+            )
 
-        # Update the display
-        pygame.display.flip()
+            match params[0].lower():
+                case "exit":
+                    s.close()
+                    break
+                case "register":
+                    message.msg_type = Message.MSG_REGISTER
+                    message.msg = params[1]
+                case "request_cars":
+                    message.msg_type = Message.MSG_REQUEST_CARS
+                case "start_rental":
+                    message.msg_type = Message.MSG_START_RENTAL
+                    message.msg = params[1]
+                case "end_rental":
+                    message.msg_type = Message.MSG_END_RENTAL
+                    message.msg = params[1]
+                case "bad_message_type":
+                    message.msg_type = 100
+                case _:
+                    print("Invalid command!")
+                    continue
 
-        # Send message to the server
-        console_input = input("-> ")
-        params = console_input.split()
+            try:
+                s.send(message.to_binary())
 
-        message = Message(user_id=user_id)
-
-        if params:
-            if params[0].lower() == "exit":
+                recv_msg = s.recv(1024)
+                print(Message(bin_msg=recv_msg))
+            except TimeoutError:
+                print("Lost server connection")
                 break
-            elif params[0].lower() == "register":
-                message.msg_type = Message.MSG_REGISTER
-                message.msg = params[1] if len(params) > 1 else ""
-            elif params[0].lower() == "request_cars":
-                message.msg_type = Message.MSG_REQUEST_CARS
-            elif params[0].lower() == "start_rental":
-                message.msg_type = Message.MSG_START_RENTAL
-                message.msg = params[1] if len(params) > 1 else ""
-            elif params[0].lower() == "end_rental":
-                message.msg_type = Message.MSG_END_RENTAL
-                message.msg = params[1] if len(params) > 1 else ""
-            elif params[0].lower() == "bad_message_type":
-                message.msg_type = 100
-            else:
-                print("Invalid command!")
-
-            s.send(message.to_binary())
-            recv_msg = s.recv(1024)
-            print(Message(bin_msg=recv_msg))
-
-        clock.tick(30)
-
-    s.close()
-    pygame.quit()
+    except KeyboardInterrupt:
+        print("Exiting...")
+    finally:
+        s.close()
 
 if __name__ == '__main__':
     main()
