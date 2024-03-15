@@ -17,7 +17,7 @@ def main():
     pygame.init()
 
     # Set up the display
-    screen = pygame.display.set_mode((1920, 1080))
+    screen = pygame.display.set_mode((1280, 720))
     pygame.display.set_caption("Car Sharing App")
 
     # Load the background images
@@ -29,6 +29,9 @@ def main():
         "carlist": pygame.image.load("img/carlist.png").convert(),
         "ride": pygame.image.load("img/ride.png").convert()
     }
+
+    for key in backgrounds:
+        backgrounds[key] = pygame.transform.scale(backgrounds[key], (1280,720))
 
     # Set up fonts
     font = pygame.font.SysFont(None, 36)
@@ -57,12 +60,12 @@ def main():
                 if current_screen == "main":
                     current_screen = "menu"
                 elif current_screen == "menu":
-                    if 1120 <= mouse_pos[0] <= 480 and 1550 <= mouse_pos[1] <= 570:
+                    if 600 <= mouse_pos[0] <= 900 and 300 <= mouse_pos[1] <= 400:
                         current_screen = "carlist"
-                    elif 1200 <= mouse_pos[0] <= 650 and 1550 <= mouse_pos[1] <= 740:
+                    elif 700 <= mouse_pos[0] <= 1000 and 450 <= mouse_pos[1] <= 600:
                         current_screen = "register"
                 elif current_screen == "register":
-                    if 1575 <= mouse_pos[0] <= 700 and 1760 <= mouse_pos[1] <= 850:
+                    if 1050 <= mouse_pos[0] <= 1180 and 400 <= mouse_pos[1] <= 600:
                         car_id = registering_text
                         if not is_valid_car_id(car_id):
                             print("Invalid car ID")
@@ -107,7 +110,7 @@ def main():
                                 current_screen = "ride"
                                 break
                 elif current_screen == "ride":
-                    if 200 <= mouse_pos[0] <= 250 and 500 <= mouse_pos[1] <= 400:
+                    if 100 <= mouse_pos[0] <= 350 and 150 <= mouse_pos[1] <= 300:
                         # End ride button clicked
                         message = Message(user_id=user_id, msg_type=Message.MSG_END_RENTAL, msg=chosen_car)
                         s.send(message.to_binary())
@@ -127,8 +130,8 @@ def main():
         match current_screen :
             case "register":
             # Draw registration text input box
-                pygame.draw.rect(screen, (255, 255, 255), (1140, 750, 350, 50))
-                draw_text(screen, registering_text, (1140, 770), font, (0, 0, 0))
+                pygame.draw.rect(screen, (255, 255, 255), (755, 500 , 245, 40))
+                draw_text(screen, registering_text, (755, 515), font, (0, 0, 0))
                 draw_text(screen, " ", (1575, 700), font, (0, 0, 0))
             case "carlist":
                 # Request list of cars from server
@@ -138,15 +141,15 @@ def main():
                 car_list = Message(bin_msg=recv_msg).msg.split('\n')[:-1]  # Assuming the server responds with a list of cars
 
                 print(car_list)
-
+# 127.0.0.1:52619
                 # Create buttons for each car
                 car_buttons = []
                 for i, car in enumerate(car_list):
                     print("banana")
-                    button_rect = pygame.Rect(1175, 700 + i * 100, 600, 50)  # Adjust these values as needed
+                    button_rect = pygame.Rect(780, 380 + i * 100, 300, 40)  # Adjust these values as needed
                     car_buttons.append(button_rect)
                     pygame.draw.rect(screen, (255, 255, 255), button_rect)
-                    draw_text(screen, car, (1175, 700 + i * 100), font, (0, 0, 0))  # Adjust these values as needed
+                    draw_text(screen, car, (785, 385 + i * 100), font, (0, 0, 0))  # Adjust these values as needed
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     for i, button_rect in enumerate(car_buttons):
